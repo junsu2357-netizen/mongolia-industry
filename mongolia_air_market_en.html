@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mongolia Air Crisis — Market Entry Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --card: #161a22;
+    --border: #222733;
+    --accent: #e85d26;
+    --accent2: #f5a623;
+    --accent3: #4fc4cf;
+    --danger: #ff3b3b;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(232,93,38,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(79,196,207,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 80px 60px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232,93,38,0.15);
+    border: 1px solid rgba(232,93,38,0.3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  .tag::before { content: '●'; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1.headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 8vw, 100px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  h1.headline span { color: var(--accent); display: block; }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 20px;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    margin-top: 36px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+
+  .meta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .meta-value { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .meta-value.bad { color: var(--danger); }
+  .meta-value.ok { color: var(--accent3); }
+
+  /* SECTION */
+  .section {
+    padding: 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  h2.section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    letter-spacing: 0.03em;
+    color: #fff;
+    margin-bottom: 36px;
+    line-height: 1.05;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover { border-color: rgba(232,93,38,0.3); transform: translateY(-2px); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .card-num.danger { color: var(--danger); }
+  .card-num.teal { color: var(--accent3); }
+
+  .card-unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .card-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 8px; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* ALERT */
+  .alert {
+    background: rgba(255,59,59,0.07);
+    border: 1px solid rgba(255,59,59,0.22);
+    border-left: 3px solid var(--danger);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+
+  .alert-title {
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .alert p { font-size: 14px; color: var(--text); line-height: 1.65; }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; flex-direction: column; gap: 14px; }
+
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+
+  .bar-label { font-size: 12px; color: var(--muted); width: 150px; flex-shrink: 0; line-height: 1.3; }
+
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    animation: fillBar 1.2s ease forwards;
+  }
+
+  @keyframes fillBar { from { width: 0 !important; } }
+
+  .bar-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    width: 64px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* REDUCTION GRID */
+  .red-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+
+  .red-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 22px;
+    text-align: center;
+  }
+
+  .red-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 46px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .red-name { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
+
+  /* OPP CARDS */
+  .opp-card {
+    background: linear-gradient(135deg, rgba(79,196,207,0.05) 0%, var(--card) 100%);
+    border: 1px solid rgba(79,196,207,0.18);
+    border-radius: 4px;
+    padding: 26px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .opp-card:hover { transform: translateY(-2px); border-color: rgba(79,196,207,0.35); }
+
+  .opp-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 68px;
+    color: rgba(79,196,207,0.12);
+    line-height: 1;
+    margin-bottom: -8px;
+  }
+
+  .opp-title { font-weight: 700; font-size: 15px; color: var(--accent3); margin-bottom: 10px; }
+  .opp-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* POLICY ROWS */
+  .policy-row {
+    padding: 13px 18px;
+    border-left: 2px solid var(--accent);
+    background: var(--card);
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .policy-row.teal { border-left-color: var(--accent3); }
+
+  /* CONCLUSION */
+  .conclusion {
+    background: linear-gradient(135deg, rgba(232,93,38,0.06), rgba(79,196,207,0.04));
+    border: 1px solid rgba(232,93,38,0.15);
+    border-radius: 6px;
+    padding: 44px;
+    margin-top: 36px;
+  }
+
+  .conclusion h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+    margin-bottom: 18px;
+    letter-spacing: 0.03em;
+  }
+
+  .conclusion p { font-size: 14px; line-height: 1.85; color: var(--muted); margin-bottom: 14px; }
+  .conclusion p strong { color: var(--text); }
+
+  .step-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .step-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .step-text strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  footer p { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* FADE IN */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.15s; }
+  .fade-in:nth-child(3) { animation-delay: 0.25s; }
+  .fade-in:nth-child(4) { animation-delay: 0.35s; }
+  .fade-in:nth-child(5) { animation-delay: 0.45s; }
+  .fade-in:nth-child(6) { animation-delay: 0.55s; }
+
+  @media (max-width: 640px) {
+    .hero, .section { padding: 40px 24px; }
+    footer { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="tag">AIR PURIFIER MARKET ENTRY · MONGOLIA · 2024</div>
+  <h1 class="headline">
+    MONGOLIA<br>
+    <span>AIR CRISIS</span>
+    REPORT
+  </h1>
+  <p class="hero-sub">Environmental analysis for air purifier market entry into Mongolia. Based on official CCAC/SNAP integrated assessment report (January 2020).</p>
+  <div class="hero-meta">
+    <div class="meta-item">
+      <span class="meta-label">Mortality Rate (per 100k)</span>
+      <span class="meta-value bad">132</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Global Average</span>
+      <span class="meta-value">92</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Black Carbon (2017)</span>
+      <span class="meta-value">10 kt</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Data Source</span>
+      <span class="meta-value ok">CCAC 2020</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: CRISIS -->
+<div class="section">
+  <div class="section-label">01 — Crisis Overview</div>
+  <h2 class="section-title">How Bad Is<br>Mongolia's Air?</h2>
+
+  <div class="alert">
+    <div class="alert-title">🚨 Public Health Emergency</div>
+    <p>During heating season, Ulaanbaatar's PM2.5 levels reach among the highest in the world. UNICEF has warned that children in Ulaanbaatar face significantly higher rates of lower respiratory infections than those in rural areas. Mongolia ranks among the world's highest-impact countries for air pollution-related mortality.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card fade-in">
+      <span class="card-icon">🫁</span>
+      <div class="card-num danger">29%</div>
+      <div class="card-unit">of cardiopulmonary deaths</div>
+      <div class="card-desc">Nearly a third of all cardiopulmonary deaths in Ulaanbaatar are directly attributable to ambient air pollution.</div>
+    </div>
+    <div class="card fade-in">
+      <span class="card-icon">🎗️</span>
+      <div class="card-num danger">40%</div>
+      <div class="card-unit">of lung cancer deaths</div>
+      <div class="card-desc">40% of lung cancer deaths in Ulaanbaatar are caused by outdoor air pollution exposure.</div>
+    </div>
+    <div class="card fade-in">
+      <span class="card-icon">💀</span>
+      <div class="card-num danger">132</div>
+      <div class="card-unit">deaths per 100,000 capita</div>
+      <div class="card-desc">43% above the world mean of 92 — placing Mongolia firmly in the high-impact category globally.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: EMISSION SOURCES -->
+<div class="section">
+  <div class="section-label">02 — Emission Sources</div>
+  <h2 class="section-title">What's Polluting<br>The Air?</h2>
+
+  <div class="grid-2" style="margin-bottom: 32px;">
+    <div>
+      <p style="font-size:14px; color:var(--muted); line-height:1.8; margin-bottom:28px;">
+        In 2017, Mongolia emitted <strong style="color:var(--text)">10 kt of black carbon</strong>, <strong style="color:var(--text)">121.5 kt of PM2.5</strong>, and <strong style="color:var(--text)">121.9 kt of NOx</strong>. Coal combustion for heating and freight transport are the dominant drivers.
+      </p>
+
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Household Heating<br>(coal combustion)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:72%; background:var(--danger);"></div></div>
+          <div class="bar-val">BC ~54%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Vegetation Fires</div>
+          <div class="bar-track"><div class="bar-fill" style="width:36%; background:var(--accent2);"></div></div>
+          <div class="bar-val">BC ~36%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Freight Transport</div>
+          <div class="bar-track"><div class="bar-fill" style="width:16%;"></div></div>
+          <div class="bar-val">BC ~6%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Power Generation</div>
+          <div class="bar-track"><div class="bar-fill" style="width:50%; background:var(--accent3);"></div></div>
+          <div class="bar-val">NOx 20%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Agriculture<br>(livestock methane)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:89%; background:var(--accent2);"></div></div>
+          <div class="bar-val">CH4 89%</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="card" style="background: rgba(255,59,59,0.05); border-color: rgba(255,59,59,0.2);">
+        <div class="card-title">🏠 Household Sector — #1 Polluter</div>
+        <div class="card-desc">Coal burning in Ulaanbaatar's ger districts dominates BC, PM2.5, and CO emissions. UB alone accounts for roughly half of all household-sector emissions nationally.</div>
+      </div>
+      <div class="card" style="background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2);">
+        <div class="card-title">🚛 Transport — NOx Driver</div>
+        <div class="card-desc">Freight transport produces over 90% of transport-sector BC, PM2.5, and NOx. As of 2018, Euro 5 fuel accounted for just 7.7% of the total fuel mix.</div>
+      </div>
+      <div class="card" style="background: rgba(79,196,207,0.05); border-color: rgba(79,196,207,0.2);">
+        <div class="card-title">⚡ Power & Heat Generation</div>
+        <div class="card-desc">CHP4 alone is responsible for ~35% of all electricity and heat sector emissions. All plants run on coal, emitting 9,883 kt of CO₂ annually.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: POLICY -->
+<div class="section">
+  <div class="section-label">03 — Government Policy & Targets</div>
+  <h2 class="section-title">How Is The Government<br>Responding?</h2>
+
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:4px; padding:20px 24px; margin-bottom:28px; font-size:14px; color:var(--muted); line-height:1.8;">
+    Mongolia's revised NDC commits to a <strong style="color:var(--text)">22.7% reduction in GHG emissions by 2030</strong> vs. a business-as-usual baseline. Combined with the national Air Quality Strategy, integrated targets address both climate and pollution simultaneously.
+  </div>
+
+  <div class="red-grid" style="margin-bottom:36px;">
+    <div class="red-item fade-in">
+      <div class="red-pct" style="color:var(--danger);">26%</div>
+      <div class="red-name">Black Carbon<br>Reduction Target</div>
+    </div>
+    <div class="red-item fade-in">
+      <div class="red-pct" style="color:var(--accent);">22%</div>
+      <div class="red-name">NOx<br>Reduction Target</div>
+    </div>
+    <div class="red-item fade-in">
+      <div class="red-pct" style="color:var(--accent2);">17%</div>
+      <div class="red-name">PM2.5<br>Reduction Target</div>
+    </div>
+    <div class="red-item fade-in">
+      <div class="red-pct" style="color:var(--accent3);">23%</div>
+      <div class="red-name">Methane (CH4)<br>Reduction Target</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="section-label" style="margin-bottom:4px;">NDC Core Actions</div>
+      <div class="policy-row">🏭 Supercritical coal power plant technology for all new builds</div>
+      <div class="policy-row">🔥 Raw coal ban in ger districts → improved briquette fuel (200,000 households)</div>
+      <div class="policy-row">🏢 Insulation upgrades for Soviet-era apartment blocks (1970s–90s)</div>
+      <div class="policy-row">🐄 Livestock quality over quantity — reducing herd sizes</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="section-label" style="margin-bottom:4px;">Air Quality Strategy Actions</div>
+      <div class="policy-row teal">⚡ Electric heating rollout to 60,000 ger households (2019–2025)</div>
+      <div class="policy-row teal">🏙️ Relocate 100,000 ger households to centrally-heated apartments</div>
+      <div class="policy-row teal">🚗 Euro 5 fuel: 70% share by 2025, 100% by 2030</div>
+      <div class="policy-row teal">📉 Reduce T&D losses from 14% → 7.8% by 2030</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: MARKET OPPORTUNITY -->
+<div class="section">
+  <div class="section-label">04 — Market Opportunity</div>
+  <h2 class="section-title">6 Reasons To Enter<br>Mongolia Now</h2>
+
+  <div class="grid-2">
+    <div class="opp-card fade-in">
+      <div class="opp-num">01</div>
+      <div class="opp-title">Extreme Pollution = Extreme Demand</div>
+      <div class="opp-desc">Winter PM2.5 levels routinely exceed WHO guidelines by dozens of times. The pain point is visceral and undeniable — demand for indoor air quality solutions is immediate and high-urgency.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">02</div>
+      <div class="opp-title">Policy Tailwinds</div>
+      <div class="opp-desc">NDC and Air Quality Strategy explicitly target household air quality improvement. Government procurement programs and subsidy schemes offer a viable B2G entry channel.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">03</div>
+      <div class="opp-title">Children & Vulnerable Populations</div>
+      <div class="opp-desc">Post-UNICEF warnings, parental anxiety about children's respiratory health is extremely high. Schools, kindergartens, and hospitals represent a fast-growing institutional B2B segment.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">04</div>
+      <div class="opp-title">Ger Districts — Blue Ocean</div>
+      <div class="opp-desc">200,000+ ger households actively burning coal for heat. Government electrification drive creates a natural bundle opportunity. A low-power, compact product line could capture this underserved segment.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">05</div>
+      <div class="opp-title">Growing Middle Class</div>
+      <div class="opp-desc">Mining-driven GDP growth is expanding Ulaanbaatar's middle class. Health awareness is rising rapidly, and willingness-to-pay for premium products is following. Korean brands carry strong trust equity.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">06</div>
+      <div class="opp-title">Competitive White Space</div>
+      <div class="opp-desc">The premium segment is largely uncontested beyond Chinese low-cost imports. First-mover advantage is available. A credible, well-positioned brand can own this category before it matures.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: CONCLUSION -->
+<div class="section" style="border-bottom: none;">
+  <div class="section-label">05 — Entry Strategy</div>
+  <h2 class="section-title">The Case For<br>Entering Now</h2>
+
+  <div class="conclusion">
+    <h3>Mongolia Is A Market That Can't Wait</h3>
+    <p>
+      <strong>Mongolia's air pollution is not an environmental footnote — it is a full-scale public health crisis.</strong> A mortality rate of 132 per 100,000 (43% above the global mean), with 29–40% of cardiopulmonary and lung cancer deaths attributable to air pollution, signals a market where the pain is acute and the willingness to act is high.
+    </p>
+    <p>
+      Government policy is already moving — NDC targets, ger district electrification, vehicle emission upgrades. <strong>This transition period is the golden window:</strong> pollution won't be fixed overnight, but purchasing power and health awareness are rising fast. The market will be won before the pollution is solved.
+    </p>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>B2B First:</strong> Schools, hospitals, corporate offices in Ulaanbaatar. Low acquisition cost, high-volume procurement, reference credibility builder.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>D2C Consumer:</strong> Premium household units targeting Ulaanbaatar's middle class. Lead with health narrative and child safety messaging.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Ger District:</strong> Affordable, compact product line tied to government electrification subsidies. High volume, high social impact, strong PR story.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>DATA SOURCE: CCAC SNAP REPORT · Mongolia Air Pollution & Climate Change · January 2020</p>
+  <p>MARKET ENTRY INTELLIGENCE · 2024</p>
+</footer>
+
+</body>
+</html>
