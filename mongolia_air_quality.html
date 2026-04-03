@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>몽골 대기오염 환경 분석 | Mongolia Air Quality Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111418;
+    --surface2: #1a1f26;
+    --accent: #e8441a;
+    --accent2: #f5a623;
+    --teal: #1fb8a0;
+    --text: #e8e4dc;
+    --muted: #7a8090;
+    --border: rgba(255,255,255,0.07);
+    --danger: #e8441a;
+    --warn: #f5a623;
+    --good: #1fb8a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* LANG TOGGLE */
+  .lang-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 14px 32px;
+    background: rgba(10,12,15,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .lang-btn {
+    cursor: pointer;
+    padding: 6px 18px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    color: var(--muted);
+    background: transparent;
+  }
+  .lang-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 60px 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 30%, rgba(232,68,26,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 70%, rgba(31,184,160,0.08) 0%, transparent 50%),
+      linear-gradient(160deg, #0a0c0f 0%, #0f1318 100%);
+  }
+  .smog-layer {
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='800' height='600' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    position: relative;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--accent);
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    position: relative;
+    margin-bottom: 32px;
+  }
+  .hero-title .line-accent { color: var(--accent); }
+  .hero-title .line-dim { color: rgba(232,228,220,0.3); font-size: 0.6em; }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    max-width: 800px;
+    margin-top: 48px;
+    position: relative;
+  }
+  .hero-stat {
+    background: var(--bg);
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-stat::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+  .hs-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .hs-unit { font-size: 20px; color: var(--accent2); }
+  .hs-label { font-size: 11px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+  .hs-label-en { display: none; }
+
+  /* SECTIONS */
+  .section { padding: 100px 60px; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--teal); text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 48px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1; max-width: 80px; height: 1px;
+    background: var(--teal); opacity: 0.4;
+  }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 0.95;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  /* PM2.5 GAUGE */
+  .gauge-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 60px;
+    margin-bottom: 80px;
+    position: relative;
+  }
+  .gauge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .pm-bar-wrap { margin-bottom: 24px; }
+  .pm-bar-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; margin-bottom: 8px;
+  }
+  .pm-name { color: var(--text); }
+  .pm-val { color: var(--accent); font-weight: 500; }
+  .pm-bar-track {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 0;
+    overflow: hidden;
+  }
+  .pm-bar-fill {
+    height: 100%;
+    border-radius: 0;
+    position: relative;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bar-danger { background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  .bar-warn { background: linear-gradient(90deg, var(--teal), var(--accent2)); }
+  .bar-safe { background: var(--teal); }
+  .who-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .big-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .big-number-label { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 80px;
+  }
+  .card {
+    background: var(--surface);
+    padding: 40px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .card:hover { background: var(--surface2); }
+  .card-icon {
+    font-size: 32px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .card-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .card-stat {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    color: var(--accent2);
+    margin-top: 16px;
+    display: block;
+  }
+
+  /* BURDEN TABLE */
+  .burden-row {
+    display: grid;
+    grid-template-columns: 1fr 140px 140px;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .burden-row:last-child { border-bottom: none; }
+  .burden-name { font-size: 14px; color: var(--text); }
+  .burden-deaths {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px; color: var(--accent);
+    text-align: right;
+  }
+  .burden-cost {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--accent2);
+    text-align: right;
+  }
+  .burden-header { color: var(--muted); font-size: 11px; letter-spacing: 2px; }
+
+  /* ROI SECTION */
+  .roi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 40px;
+  }
+  .roi-card {
+    background: var(--surface);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .roi-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .roi-card.electric::after { background: var(--teal); }
+  .roi-card.lpg::after { background: var(--accent2); }
+  .roi-card.mixed::after { background: var(--accent); }
+  .roi-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--muted); margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .roi-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .electric .roi-num { color: var(--teal); }
+  .lpg .roi-num { color: var(--accent2); }
+  .mixed .roi-num { color: var(--accent); }
+  .roi-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* RECOMMENDATIONS */
+  .rec-list { list-style: none; }
+  .rec-item {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .rec-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; color: var(--accent);
+    line-height: 1; opacity: 0.4;
+  }
+  .rec-title {
+    font-size: 17px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .rec-body { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  /* FOOTER */
+  footer {
+    padding: 60px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-src { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* DIVIDER */
+  .full-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 60px;
+  }
+
+  /* ANIMATION */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero > * { animation: fadeUp 0.8s ease backwards; }
+  .hero .hero-tag { animation-delay: 0.1s; }
+  .hero .hero-title { animation-delay: 0.25s; }
+  .hero .hero-stats { animation-delay: 0.45s; }
+
+  /* LANG */
+  [data-lang="en"] { display: none; }
+  body.en [data-lang="ko"] { display: none; }
+  body.en [data-lang="en"] { display: block; }
+  body.en .hs-label { display: none; }
+  body.en .hs-label-en { display: block; font-size: 11px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+  span[data-lang="en"] { display: none; }
+  body.en span[data-lang="ko"] { display: none; }
+  body.en span[data-lang="en"] { display: inline; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero { padding: 80px 24px 60px; }
+    .section { padding: 60px 24px; }
+    .gauge-grid { grid-template-columns: 1fr; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .roi-grid { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 16px; padding: 40px 24px; }
+    .gauge-section { padding: 36px 24px; }
+    .lang-bar { padding: 14px 24px; }
+    .full-divider { margin: 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('ko')" id="btn-ko">한국어</button>
+  &nbsp;
+  <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="smog-layer"></div>
+
+  <div class="hero-tag">
+    <span data-lang="ko">몽골 대기오염 환경 분석 리포트 · UNDP 2024</span>
+    <span data-lang="en">Mongolia Air Quality Market Entry Report · UNDP 2024</span>
+  </div>
+
+  <h1 class="hero-title">
+    <span class="line-dim">
+      <span data-lang="ko">숨막히는</span>
+      <span data-lang="en">BREATHLESS</span>
+    </span><br>
+    <span class="line-accent">
+      <span data-lang="ko">몽골</span>
+      <span data-lang="en">MONGOLIA</span>
+    </span>
+  </h1>
+
+  <div style="max-width:560px; font-size:15px; line-height:1.9; color:var(--muted); position:relative;">
+    <span data-lang="ko">울란바토르는 세계 최악의 대기질 도시 중 하나입니다. 공기청정기 시장 진입을 위한 핵심 환경 분석 데이터를 정리했습니다.</span>
+    <span data-lang="en">Ulaanbaatar ranks among the world's most polluted cities. Here is the essential environmental data for your air purifier market entry strategy.</span>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hs-val">60<span class="hs-unit">㎍</span></div>
+      <div class="hs-label">연평균 PM2.5 농도 (2019)</div>
+      <div class="hs-label-en">Annual Avg. PM2.5 (2019)</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-val" style="color:var(--accent2);">12<span class="hs-unit">×</span></div>
+      <div class="hs-label">WHO 권고 기준 초과배수</div>
+      <div class="hs-label-en">Times over WHO Guideline</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-val" style="color:var(--teal);">7,150</div>
+      <div class="hs-label">연간 대기오염 사망자 수</div>
+      <div class="hs-label-en">Annual Deaths from Air Pollution</div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- PM2.5 LEVELS -->
+<div style="max-width:1200px; margin:0 auto;">
+  <div class="section">
+    <div class="section-label">
+      <span data-lang="ko">01 — 대기오염 현황</span>
+      <span data-lang="en">01 — Air Pollution Status</span>
+    </div>
+
+    <h2>
+      <span data-lang="ko">WHO 기준의<br><span style="color:var(--accent);">12배</span>를 초과하는<br>초미세먼지</span>
+      <span data-lang="en">PM2.5 Levels<br><span style="color:var(--accent);">12× Higher</span><br>Than WHO Limits</span>
+    </h2>
+
+    <div class="gauge-section">
+      <div class="gauge-grid">
+        <div>
+          <div data-lang="ko" style="font-size:14px; color:var(--muted); margin-bottom:32px; line-height:1.8;">
+            WHO 연평균 PM2.5 권고기준은 5㎍/m³입니다. 울란바토르 중심 지역의 PM2.5는 이를 최대 <strong style="color:var(--text);">12배 이상</strong> 초과하며, 한겨울에는 <strong style="color:var(--accent);">687㎍/m³</strong>에 달하기도 합니다.
+          </div>
+          <div data-lang="en" style="font-size:14px; color:var(--muted); margin-bottom:32px; line-height:1.8;">
+            WHO annual PM2.5 guideline is 5㎍/m³. Central districts of Ulaanbaatar exceed this by <strong style="color:var(--text);">up to 12×</strong>, and on the coldest winter days levels reach <strong style="color:var(--accent);">687㎍/m³</strong>.
+          </div>
+
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-label">
+              <span class="pm-name">Chingeltei</span>
+              <span class="pm-val">52 ㎍/m³</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill bar-danger" style="width:78%"></div>
+            </div>
+            <div class="who-line">WHO: 5 ㎍/m³ ↑ 10.4×</div>
+          </div>
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-label">
+              <span class="pm-name">Khan Uul</span>
+              <span class="pm-val">44 ㎍/m³</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill bar-danger" style="width:66%"></div>
+            </div>
+            <div class="who-line">WHO: 5 ㎍/m³ ↑ 8.8×</div>
+          </div>
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-label">
+              <span class="pm-name">Bayangol</span>
+              <span class="pm-val">48 ㎍/m³</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill bar-danger" style="width:72%"></div>
+            </div>
+            <div class="who-line">WHO: 5 ㎍/m³ ↑ 9.6×</div>
+          </div>
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-label">
+              <span class="pm-name">Bayanzurkh</span>
+              <span class="pm-val">19 ㎍/m³</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill bar-warn" style="width:28%"></div>
+            </div>
+            <div class="who-line">WHO: 5 ㎍/m³ ↑ 3.8×</div>
+          </div>
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-label">
+              <span class="pm-name">
+                <span data-lang="ko">WHO 권고기준</span>
+                <span data-lang="en">WHO Guideline</span>
+              </span>
+              <span class="pm-val" style="color:var(--teal);">5 ㎍/m³</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill bar-safe" style="width:7%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <span class="big-number">687</span>
+          <div class="big-number-label">
+            <strong style="color:var(--text);">㎍/m³</strong><br>
+            <span data-lang="ko">겨울철 최대 PM2.5 농도<br>— WHO 기준의 <span style="color:var(--accent);">137배</span></span>
+            <span data-lang="en">Peak winter PM2.5<br>— <span style="color:var(--accent);">137×</span> WHO Safe Level</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOURCE BREAKDOWN -->
+    <div data-lang="ko" style="margin-bottom:16px; font-size:13px; color:var(--muted);">▶ 울란바토르 PM2.5 발생원 비율 (2010년 기준)</div>
+    <div data-lang="en" style="margin-bottom:16px; font-size:13px; color:var(--muted);">▶ PM2.5 Sources in Ulaanbaatar (2010 baseline)</div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:1px; background:var(--border);">
+      <div style="background:var(--surface); padding:28px 24px; text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--accent);">80%</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+          <span data-lang="ko">가정 석탄 연소</span>
+          <span data-lang="en">Household Coal</span>
+        </div>
+      </div>
+      <div style="background:var(--surface); padding:28px 24px; text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--accent2);">28%</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+          <span data-lang="ko">발전소</span>
+          <span data-lang="en">Power Plants</span>
+        </div>
+      </div>
+      <div style="background:var(--surface); padding:28px 24px; text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--teal);">8%</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+          <span data-lang="ko">야외 소각·화재</span>
+          <span data-lang="en">Open Fires</span>
+        </div>
+      </div>
+      <div style="background:var(--surface); padding:28px 24px; text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--teal);">6%</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">
+          <span data-lang="ko">차량·도로 먼지</span>
+          <span data-lang="en">Vehicles & Road Dust</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- HEALTH BURDEN -->
+<div style="max-width:1200px; margin:0 auto;">
+  <div class="section">
+    <div class="section-label">
+      <span data-lang="ko">02 — 보건·경제적 피해</span>
+      <span data-lang="en">02 — Health & Economic Burden</span>
+    </div>
+
+    <h2>
+      <span data-lang="ko">GDP의 <span style="color:var(--accent);">10%</span>를<br>날리는 대기오염</span>
+      <span data-lang="en">Air Pollution Costs<br><span style="color:var(--accent);">10%</span> of GDP Annually</span>
+    </h2>
+
+    <div class="cards-grid" style="margin-bottom:48px;">
+      <div class="card">
+        <span class="card-icon">🏭</span>
+        <div class="card-title">
+          <span data-lang="ko">실외 대기오염 (AAP)</span>
+          <span data-lang="en">Ambient Air Pollution (AAP)</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">연간 2,800명 이상이 실외 미세먼지(PM2.5)로 사망합니다. 뇌졸중·심장질환이 사망자의 대부분을 차지하며, 경제적 손실은 GDP의 2.4%에 해당합니다.</span>
+          <span data-lang="en">Over 2,800 people die annually from outdoor PM2.5. Stroke and heart disease account for the majority of deaths. Economic losses equal 2.4% of GDP.</span>
+        </div>
+        <span class="card-stat">US$269M / yr</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏠</span>
+        <div class="card-title">
+          <span data-lang="ko">실내 대기오염 (HAP)</span>
+          <span data-lang="en">Household Air Pollution (HAP)</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">연간 약 4,350명이 실내 석탄 조리·난방으로 인한 오염으로 사망합니다. 이는 GDP의 7.6%에 해당하는 손실이며, 실내 PM2.5는 WHO 기준의 5~6배 수준입니다.</span>
+          <span data-lang="en">~4,350 people die annually from indoor coal stove pollution. This equals 7.6% of GDP in losses. Indoor PM2.5 levels are 5–6× WHO guidelines.</span>
+        </div>
+        <span class="card-stat">US$1.2B / yr</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏥</span>
+        <div class="card-title">
+          <span data-lang="ko">주요 관련 질환</span>
+          <span data-lang="en">Key Related Diseases</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">급성 하기도 감염, COPD, 허혈성 심장질환, 폐암, 뇌졸중, 제2형 당뇨. 어린이의 경우 뇌 발달 저해·천식 위험도 증가.</span>
+          <span data-lang="en">Acute lower respiratory infection, COPD, ischemic heart disease, lung cancer, stroke, type 2 diabetes. Children face increased risk of impaired brain development and asthma.</span>
+        </div>
+        <span class="card-stat">6 diseases tracked</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">👩</span>
+        <div class="card-title">
+          <span data-lang="ko">여성·아동 취약성</span>
+          <span data-lang="en">Women & Children at Risk</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">몽골 여성은 하루 평균 5시간 가사·육아에 종사하며 실내 오염에 더 많이 노출됩니다. 임산부의 경우 겨울철 조산 위험이 높아지고, 태아 사망률은 여름 대비 3.5배 높습니다.</span>
+          <span data-lang="en">Mongolian women spend an avg. 5 hrs/day on domestic duties, increasing exposure. Pregnant women face higher preterm birth risk in winter; fetal death is 3.5× more common in winter vs. summer.</span>
+        </div>
+        <span class="card-stat">5hrs/day exposure</span>
+      </div>
+    </div>
+
+    <!-- BURDEN TABLE -->
+    <div style="background:var(--surface); border:1px solid var(--border); padding:40px;">
+      <div class="burden-row">
+        <div class="burden-name burden-header">
+          <span data-lang="ko">질환</span>
+          <span data-lang="en">Disease</span>
+        </div>
+        <div class="burden-deaths burden-header">
+          <span data-lang="ko">연간 사망 (AAP)</span>
+          <span data-lang="en">Deaths/yr (AAP)</span>
+        </div>
+        <div class="burden-cost burden-header">
+          <span data-lang="ko">경제적 손실</span>
+          <span data-lang="en">Economic Loss</span>
+        </div>
+      </div>
+      <div class="burden-row">
+        <div class="burden-name">
+          <span data-lang="ko">뇌졸중</span><span data-lang="en">Stroke</span>
+        </div>
+        <div class="burden-deaths">1,244</div>
+        <div class="burden-cost">$120.8M</div>
+      </div>
+      <div class="burden-row">
+        <div class="burden-name">
+          <span data-lang="ko">허혈성 심장질환</span><span data-lang="en">Ischemic Heart Disease</span>
+        </div>
+        <div class="burden-deaths">1,241</div>
+        <div class="burden-cost">$106.5M</div>
+      </div>
+      <div class="burden-row">
+        <div class="burden-name">
+          <span data-lang="ko">폐암</span><span data-lang="en">Lung Cancer</span>
+        </div>
+        <div class="burden-deaths">169</div>
+        <div class="burden-cost">$13.5M</div>
+      </div>
+      <div class="burden-row">
+        <div class="burden-name">
+          <span data-lang="ko">급성 하기도 감염</span><span data-lang="en">Acute Lower Respiratory Infection</span>
+        </div>
+        <div class="burden-deaths">81</div>
+        <div class="burden-cost">$20.0M</div>
+      </div>
+      <div class="burden-row">
+        <div class="burden-name">
+          <span data-lang="ko">COPD</span><span data-lang="en">COPD</span>
+        </div>
+        <div class="burden-deaths">78</div>
+        <div class="burden-cost">$5.0M</div>
+      </div>
+      <div class="burden-row" style="border-top:1px solid var(--accent); padding-top:20px;">
+        <div class="burden-name" style="color:var(--accent); font-weight:700;">TOTAL</div>
+        <div class="burden-deaths" style="color:var(--accent);">2,839</div>
+        <div class="burden-cost" style="color:var(--accent);">$268.7M</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- MARKET CONTEXT -->
+<div style="max-width:1200px; margin:0 auto;">
+  <div class="section">
+    <div class="section-label">
+      <span data-lang="ko">03 — 시장 환경 분석</span>
+      <span data-lang="en">03 — Market Environment</span>
+    </div>
+
+    <h2>
+      <span data-lang="ko">공기청정기 진입<br><span style="color:var(--teal);">핵심 인사이트</span></span>
+      <span data-lang="en">Air Purifier Entry<br><span style="color:var(--teal);">Key Insights</span></span>
+    </h2>
+
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">📊</span>
+        <div class="card-title">
+          <span data-lang="ko">수요 규모</span>
+          <span data-lang="en">Demand Scale</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">울란바토르 인구 약 150만 명, 전국 인구의 절반이 거주. 게르(ger) 지역 약 180,000 가구가 석탄 난방에 의존. 겨울 오염이 극심해 실내 공기질 수요가 매우 높음.</span>
+          <span data-lang="en">~1.5M people in Ulaanbaatar, half the national population. ~180,000 ger households depend on coal. Extreme winter pollution creates very high indoor air quality demand.</span>
+        </div>
+        <span class="card-stat">~180K households</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">❄️</span>
+        <div class="card-title">
+          <span data-lang="ko">계절적 패턴</span>
+          <span data-lang="en">Seasonal Pattern</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">11월~3월 겨울 시즌에 오염이 폭발적으로 증가. 난방용 석탄 사용이 집중되기 때문. 최대 PM2.5는 687㎍/m³로 여름 대비 수십 배 차이. 겨울 시즌 마케팅이 핵심.</span>
+          <span data-lang="en">Pollution spikes dramatically from Nov–Mar due to concentrated heating coal use. Peak PM2.5 hits 687㎍/m³ vs. mild summers. Winter-season marketing is critical.</span>
+        </div>
+        <span class="card-stat">Nov — Mar peak</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏛️</span>
+        <div class="card-title">
+          <span data-lang="ko">정부 정책 동향</span>
+          <span data-lang="en">Government Policy Trends</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">2019년 원탄 사용 금지령 시행. 40,000가구 전기·가스 스토브 전환 계획 추진 중. 아시아개발은행 등 국제기구의 대규모 투자 지속. 정부 정책이 청정 공기 수요를 더욱 키우는 중.</span>
+          <span data-lang="en">Raw coal ban enacted 2019. 40,000 household stove transition underway. Ongoing major investment from ADB and World Bank. Government policy is actively expanding clean air demand.</span>
+        </div>
+        <span class="card-stat">$161M invested (2017–20)</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">📈</span>
+        <div class="card-title">
+          <span data-lang="ko">의식·경각심 수준</span>
+          <span data-lang="en">Public Awareness Level</span>
+        </div>
+        <div class="card-body">
+          <span data-lang="ko">UNDP 보고서에 따르면 대기오염 건강 영향에 대한 공공 인식이 낮은 편. 정부의 인식 제고 캠페인 권고가 내려진 상태. 교육적 마케팅과 함께 진입 시 선점 효과 기대.</span>
+          <span data-lang="en">UNDP report notes limited public awareness of air pollution health impacts. Government recommendations call for awareness campaigns. Early-mover educational marketing creates first-mover advantage.</span>
+        </div>
+        <span class="card-stat">Low awareness = opportunity</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- ROI / INTERVENTION -->
+<div style="max-width:1200px; margin:0 auto;">
+  <div class="section">
+    <div class="section-label">
+      <span data-lang="ko">04 — 해결책 ROI 분석</span>
+      <span data-lang="en">04 — Solution ROI Analysis</span>
+    </div>
+
+    <h2>
+      <span data-lang="ko">투자하면<br><span style="color:var(--teal);">돌아온다</span></span>
+      <span data-lang="en">Investment<br><span style="color:var(--teal);">Pays Back</span></span>
+    </h2>
+
+    <div data-lang="ko" style="font-size:14px; color:var(--muted); line-height:1.8; max-width:640px; margin-bottom:16px;">
+      UNDP 분석에 따르면, 석탄 스토브를 전기 또는 가스로 교체할 경우 31년간 최소 4.8:1의 투자 수익률(ROI)을 달성합니다. 대기 오염 감소 인터벤션 전체로는 2055년까지 US$6억 7,100만 손실을 회피합니다.
+    </div>
+    <div data-lang="en" style="font-size:14px; color:var(--muted); line-height:1.8; max-width:640px; margin-bottom:16px;">
+      UNDP analysis shows replacing coal stoves with electric or gas generates a minimum ROI of 4.8:1 over 31 years. All AAP interventions combined would avert US$671M in losses by 2055.
+    </div>
+
+    <div class="roi-grid">
+      <div class="roi-card electric">
+        <div class="roi-label">
+          <span data-lang="ko">전기 스토브 전환</span>
+          <span data-lang="en">Coal → Electric Stove</span>
+        </div>
+        <div class="roi-num">5.6</div>
+        <div style="font-family:'DM Mono',monospace; font-size:13px; color:var(--teal); margin-bottom:12px;">ROI : 1</div>
+        <div class="roi-sub">
+          <span data-lang="ko">656명 생명 구조<br>US$5,400만 손실 회피 (31년)</span>
+          <span data-lang="en">656 lives saved<br>US$54M losses averted (31 yrs)</span>
+        </div>
+      </div>
+      <div class="roi-card lpg">
+        <div class="roi-label">
+          <span data-lang="ko">LPG 가스 스토브 전환</span>
+          <span data-lang="en">Coal → LPG Gas Stove</span>
+        </div>
+        <div class="roi-num">7.2</div>
+        <div style="font-family:'DM Mono',monospace; font-size:13px; color:var(--accent2); margin-bottom:12px;">ROI : 1</div>
+        <div class="roi-sub">
+          <span data-lang="ko">322명 생명 구조<br>US$2,650만 손실 회피 (31년)</span>
+          <span data-lang="en">322 lives saved<br>US$26.5M losses averted (31 yrs)</span>
+        </div>
+      </div>
+      <div class="roi-card mixed">
+        <div class="roi-label">
+          <span data-lang="ko">혼합 전환 (정부 계획안)</span>
+          <span data-lang="en">Mixed Transition (Gov. Plan)</span>
+        </div>
+        <div class="roi-num">4.8</div>
+        <div style="font-family:'DM Mono',monospace; font-size:13px; color:var(--accent); margin-bottom:12px;">ROI : 1</div>
+        <div class="roi-sub">
+          <span data-lang="ko">350명 생명 구조<br>US$2,900만 손실 회피 (31년)</span>
+          <span data-lang="en">350 lives saved<br>US$29M losses averted (31 yrs)</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px; padding:28px 32px; background:var(--surface); border-left:3px solid var(--accent2);">
+      <div style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--accent2); margin-bottom:8px;">KEY TAKEAWAY</div>
+      <div style="font-size:15px; line-height:1.8; color:var(--text);">
+        <span data-lang="ko">4가지 AAP 인터벤션을 모두 시행할 경우 2055년까지 <strong>11,000명 이상의 생명</strong>과 <strong>US$6억 7,100만</strong>의 경제적 손실을 회피할 수 있습니다.</span>
+        <span data-lang="en">Combined, the four AAP interventions could save <strong>over 11,000 lives</strong> and avert <strong>US$671 million</strong> in economic losses by 2055.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="full-divider"></div>
+
+<!-- RECOMMENDATIONS FOR ENTRY -->
+<div style="max-width:1200px; margin:0 auto;">
+  <div class="section">
+    <div class="section-label">
+      <span data-lang="ko">05 — 시장 진입 전략 시사점</span>
+      <span data-lang="en">05 — Market Entry Implications</span>
+    </div>
+
+    <h2>
+      <span data-lang="ko">공기청정기 기업이<br><span style="color:var(--accent);">주목해야 할</span> 포인트</span>
+      <span data-lang="en">What Air Purifier Brands<br><span style="color:var(--accent);">Should Focus On</span></span>
+    </h2>
+
+    <ul class="rec-list">
+      <li class="rec-item">
+        <div class="rec-num">01</div>
+        <div>
+          <div class="rec-title">
+            <span data-lang="ko">겨울 시즌 = 황금 시즌</span>
+            <span data-lang="en">Winter Season = Golden Season</span>
+          </div>
+          <div class="rec-body">
+            <span data-lang="ko">11~3월 한겨울 PM2.5가 WHO 기준의 최대 137배에 달합니다. 이 시기 공기청정기 수요가 극적으로 증가합니다. 겨울 시즌 집중 마케팅과 사전 재고 확보가 필수입니다.</span>
+            <span data-lang="en">Winter PM2.5 reaches 137× WHO limits. Demand for air purifiers spikes dramatically. Concentrated winter marketing and pre-season inventory are essential.</span>
+          </div>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">02</div>
+        <div>
+          <div class="rec-title">
+            <span data-lang="ko">게르(Ger) 지역 특화 제품 전략</span>
+            <span data-lang="en">Ger District-Specific Product Strategy</span>
+          </div>
+          <div class="rec-body">
+            <span data-lang="ko">울란바토르 인구의 60%가 게르 지역 거주. 전력망 연결이 불안정한 지역이 많아 저전력·배터리 지원 모델 또는 강력한 필터 성능의 소형 제품이 유리합니다.</span>
+            <span data-lang="en">60% of Ulaanbaatar's population lives in ger districts with unstable electricity grids. Low-power, battery-supported models or compact, high-filtration products have a competitive edge.</span>
+          </div>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">03</div>
+        <div>
+          <div class="rec-title">
+            <span data-lang="ko">정부·NGO 협력 채널 활용</span>
+            <span data-lang="en">Leverage Government & NGO Channels</span>
+          </div>
+          <div class="rec-body">
+            <span data-lang="ko">몽골 정부는 UNDP, ADB, EU 등과 협력해 대기오염 감소 정책을 추진 중. B2G(정부 조달) 또는 NGO 파트너십을 통한 초기 시장 진입이 빠른 신뢰 구축에 효과적입니다.</span>
+            <span data-lang="en">Mongolia's government is actively partnering with UNDP, ADB, and the EU on clean air. B2G procurement or NGO partnerships offer a fast trust-building channel for initial market entry.</span>
+          </div>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">04</div>
+        <div>
+          <div class="rec-title">
+            <span data-lang="ko">PM2.5 교육 마케팅으로 인식 제고</span>
+            <span data-lang="en">Educational PM2.5 Marketing to Build Awareness</span>
+          </div>
+          <div class="rec-body">
+            <span data-lang="ko">대기오염 건강 영향에 대한 공공 인식이 아직 낮습니다. 수치 기반의 명확한 건강 위협 커뮤니케이션(예: "지금 당신이 마시는 공기는 WHO 기준의 12배")이 제품 필요성을 직접 환기합니다.</span>
+            <span data-lang="en">Public awareness of air pollution health impacts remains low. Data-driven health threat messaging (e.g., "The air you breathe is 12× WHO safe levels") directly communicates product necessity.</span>
+          </div>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">05</div>
+        <div>
+          <div class="rec-title">
+            <span data-lang="ko">여성·아동 타겟 메시지</span>
+            <span data-lang="en">Women & Child-Focused Messaging</span>
+          </div>
+          <div class="rec-body">
+            <span data-lang="ko">실내 오염의 주요 피해자는 가정에서 더 많은 시간을 보내는 여성과 어린이입니다. 임산부 보호, 어린이 폐 건강 등을 전면에 내세우는 감성적 커뮤니케이션 전략이 효과적입니다.</span>
+            <span data-lang="en">Women and children bear the greatest burden of indoor pollution. Emotional messaging centered on protecting pregnant mothers and children's lung development drives purchasing decisions.</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div style="font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:8px; color:var(--text);">
+      <span data-lang="ko">몽골 대기오염 분석</span>
+      <span data-lang="en">Mongolia Air Quality Analysis</span>
+    </div>
+    <div class="footer-src">
+      Source: UNDP Investment Case for Air Pollution Reduction in Mongolia, 2024<br>
+      WHO Air Quality Database 2022 · Asian Development Bank · Ministry of Health Mongolia
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div class="footer-src" style="margin-bottom:4px;">
+      <span data-lang="ko">데이터 기준연도: 2019–2024</span>
+      <span data-lang="en">Data Reference Years: 2019–2024</span>
+    </div>
+    <div class="footer-src">© UNDP 2024 · CC BY-NC-SA 3.0 IGO</div>
+  </div>
+</footer>
+
+<script>
+  function setLang(lang) {
+    if (lang === 'en') {
+      document.body.classList.add('en');
+      document.getElementById('btn-en').classList.add('active');
+      document.getElementById('btn-ko').classList.remove('active');
+    } else {
+      document.body.classList.remove('en');
+      document.getElementById('btn-ko').classList.add('active');
+      document.getElementById('btn-en').classList.remove('active');
+    }
+  }
+
+  // Animate bars on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.pm-bar-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = w; }, 300);
+    });
+  });
+</script>
+</body>
+</html>
