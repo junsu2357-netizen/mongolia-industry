@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mongolia Air Market Entry — CU Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --card: #161a22;
+    --border: #222733;
+    --accent: #e85d26;
+    --accent2: #f5a623;
+    --accent3: #4fc4cf;
+    --danger: #ff3b3b;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --dust: rgba(232,93,38,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Particle dust bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(232,93,38,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(79,196,207,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 80px 60px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero-noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232,93,38,0.15);
+    border: 1px solid rgba(232,93,38,0.3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  .tag::before {
+    content: '●';
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1.headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 8vw, 96px);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  h1.headline span {
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 20px;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    margin-top: 32px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .meta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .meta-value.bad { color: var(--danger); }
+  .meta-value.ok { color: var(--accent3); }
+
+  /* SECTION */
+  .section {
+    padding: 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  h2.section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: 0.03em;
+    color: #fff;
+    margin-bottom: 32px;
+    line-height: 1.1;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(232,93,38,0.3);
+    transform: translateY(-2px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .card-num.danger { color: var(--danger); }
+  .card-num.teal { color: var(--accent3); }
+  .card-num.gold { color: var(--accent2); }
+
+  .card-unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  /* ALERT BOX */
+  .alert {
+    background: rgba(255,59,59,0.08);
+    border: 1px solid rgba(255,59,59,0.25);
+    border-left: 3px solid var(--danger);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .alert-title {
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 6px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .alert p { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+
+  .bar-label {
+    font-size: 12px;
+    color: var(--muted);
+    width: 140px;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width 1s ease;
+    animation: fillBar 1.2s ease forwards;
+  }
+
+  @keyframes fillBar { from { width: 0 !important; } }
+
+  .bar-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* OPPORTUNITY CARDS */
+  .opp-card {
+    background: linear-gradient(135deg, rgba(79,196,207,0.05) 0%, var(--card) 100%);
+    border: 1px solid rgba(79,196,207,0.2);
+    border-radius: 4px;
+    padding: 24px;
+  }
+
+  .opp-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: rgba(79,196,207,0.15);
+    line-height: 1;
+    margin-bottom: -10px;
+  }
+
+  .opp-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent3);
+    margin-bottom: 10px;
+  }
+
+  .opp-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* REDUCTION TABLE */
+  .red-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+
+  .red-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .red-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .red-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* CONCLUSION */
+  .conclusion {
+    background: linear-gradient(135deg, rgba(232,93,38,0.06), rgba(79,196,207,0.04));
+    border: 1px solid rgba(232,93,38,0.15);
+    border-radius: 6px;
+    padding: 40px;
+    margin-top: 32px;
+  }
+
+  .conclusion h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+  }
+
+  .conclusion p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .conclusion p strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Fade in */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  .fade-in:nth-child(1) { animation-delay: 0.1s; }
+  .fade-in:nth-child(2) { animation-delay: 0.2s; }
+  .fade-in:nth-child(3) { animation-delay: 0.3s; }
+  .fade-in:nth-child(4) { animation-delay: 0.4s; }
+  .fade-in:nth-child(5) { animation-delay: 0.5s; }
+  .fade-in:nth-child(6) { animation-delay: 0.6s; }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 32px 0;
+  }
+
+  @media (max-width: 640px) {
+    .hero, .section { padding: 40px 24px; }
+    footer { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-noise"></div>
+  <div class="tag">MARKET ENTRY ANALYSIS · MONGOLIA · 2024</div>
+  <h1 class="headline">
+    MONGOLIA<br>
+    <span>AIR CRISIS</span>
+    REPORT
+  </h1>
+  <p class="hero-sub">공기청정기 시장 진입을 위한 몽골 대기오염 현황 분석. CCAC·SNAP 공식 보고서 기반.</p>
+  <div class="hero-meta">
+    <div class="meta-item">
+      <span class="meta-label">사망률 (10만명당)</span>
+      <span class="meta-value bad">132명</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">세계 평균</span>
+      <span class="meta-value">92명</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">흑탄소 배출 (2017)</span>
+      <span class="meta-value">10 kt</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">보고서 출처</span>
+      <span class="meta-value ok">CCAC 2020</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: 위기 현황 -->
+<div class="section">
+  <div class="section-label">01 — 위기 현황</div>
+  <h2 class="section-title">몽골의 대기오염,<br>얼마나 심각한가?</h2>
+
+  <div class="alert">
+    <div class="alert-title">🚨 WHO 기준 초과 경보</div>
+    <p>울란바토르는 겨울철 난방 시즌 동안 PM2.5 농도가 세계 최고 수준에 달하며, UNICEF는 울란바토르 어린이들이 농촌 아이들보다 하기도 감염 위험이 현저히 높다고 경고했습니다.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card fade-in">
+      <span class="card-icon">🫁</span>
+      <div class="card-num danger">29%</div>
+      <div class="card-unit">심폐 질환 사망 중</div>
+      <div class="card-desc">울란바토르 심폐 사망의 29%가 대기오염에 직접 기인</div>
+    </div>
+    <div class="card fade-in">
+      <span class="card-icon">🎗️</span>
+      <div class="card-num danger">40%</div>
+      <div class="card-unit">폐암 사망 중</div>
+      <div class="card-desc">울란바토르 폐암 사망의 40%가 실외 대기오염 원인</div>
+    </div>
+    <div class="card fade-in">
+      <span class="card-icon">💀</span>
+      <div class="card-num danger">132</div>
+      <div class="card-unit">사망 / 10만명</div>
+      <div class="card-desc">세계 평균(92명) 대비 43% 높은 고위험 국가</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: 오염원 분석 -->
+<div class="section">
+  <div class="section-label">02 — 오염원 분석</div>
+  <h2 class="section-title">무엇이 공기를<br>오염시키는가?</h2>
+
+  <div class="grid-2" style="margin-bottom: 32px;">
+    <div>
+      <p style="font-size:14px; color:var(--muted); line-height:1.8; margin-bottom:24px;">
+        2017년 기준 <strong style="color:var(--text)">흑탄소(BC) 10kt</strong>, <strong style="color:var(--text)">PM2.5 121.5kt</strong>, <strong style="color:var(--text)">NOx 121.9kt</strong>가 배출됐습니다. 주요 원인은 석탄 난방과 차량 배기가스입니다.
+      </p>
+
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">가정용 난방<br>(석탄 연소)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:72%; background:var(--danger);"></div></div>
+          <div class="bar-val">BC 54%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">식생 화재<br>(Vegetation Fires)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:36%; background:var(--accent2);"></div></div>
+          <div class="bar-val">BC 36%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">운송 (화물)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:16%;"></div></div>
+          <div class="bar-val">BC 6%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">발전소</div>
+          <div class="bar-track"><div class="bar-fill" style="width:8%; background:var(--accent3);"></div></div>
+          <div class="bar-val">NOx 20%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">농업 (메탄)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:88%; background:var(--accent2);"></div></div>
+          <div class="bar-val">CH4 89%</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="card" style="background: rgba(255,59,59,0.05); border-color: rgba(255,59,59,0.2);">
+        <div class="card-title">🏠 가정 난방 (최대 오염원)</div>
+        <div class="card-desc">울란바토르 게르 지구의 석탄 연소가 가장 큰 비중. BC·PM2.5·CO의 절반 이상이 여기서 발생. 울란바토르가 전국 가정 부문 배출의 약 절반 담당.</div>
+      </div>
+      <div class="card" style="background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2);">
+        <div class="card-title">🚛 운송 (NOx 주범)</div>
+        <div class="card-desc">화물 운송이 운송 부문 BC·PM2.5·NOx의 90% 이상 배출. 2018년 기준 Euro 5 연료 비중은 고작 7.7%에 불과.</div>
+      </div>
+      <div class="card" style="background: rgba(79,196,207,0.05); border-color: rgba(79,196,207,0.2);">
+        <div class="card-title">⚡ 발전·열 공급</div>
+        <div class="card-desc">CHP4 단일 발전소가 전체 전력·열 부문 배출의 35% 차지. 모두 석탄 연소 기반으로 CO2 9,883kt 배출.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: 정부 정책 -->
+<div class="section">
+  <div class="section-label">03 — 정책 & 감축 목표</div>
+  <h2 class="section-title">정부는 어떻게<br>대응하고 있나?</h2>
+
+  <div style="margin-bottom:32px;">
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:4px; padding:20px; margin-bottom:16px; font-size:13px; color:var(--muted); line-height:1.8;">
+      몽골 개정 NDC(국가결정기여)는 <strong style="color:var(--text)">2030년까지 온실가스 22.7% 감축</strong>을 목표로 하며, 이와 동시에 대기오염도 줄이는 통합 전략을 추진 중입니다.
+    </div>
+
+    <div class="red-grid">
+      <div class="red-item fade-in">
+        <div class="red-pct" style="color:var(--danger);">26%</div>
+        <div class="red-name">흑탄소(BC) 감축</div>
+      </div>
+      <div class="red-item fade-in">
+        <div class="red-pct" style="color:var(--accent);">22%</div>
+        <div class="red-name">NOx 감축</div>
+      </div>
+      <div class="red-item fade-in">
+        <div class="red-pct" style="color:var(--accent2);">17%</div>
+        <div class="red-name">PM2.5 감축</div>
+      </div>
+      <div class="red-item fade-in">
+        <div class="red-pct" style="color:var(--accent3);">23%</div>
+        <div class="red-name">메탄(CH4) 감축</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="section-label" style="margin-bottom:12px;">NDC 핵심 조치</div>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--muted); line-height:1.7;">
+        <div style="padding:12px 16px; border-left:2px solid var(--accent); background:var(--card); border-radius:0 4px 4px 0;">🏭 신규 석탄 발전소 초임계 기술 도입</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent); background:var(--card); border-radius:0 4px 4px 0;">🔥 게르 지구 원석탄 금지 → 개선형 연탄 전환 (20만 가구)</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent); background:var(--card); border-radius:0 4px 4px 0;">🏢 아파트 단열 개선 (1970~90년대 건축)</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent); background:var(--card); border-radius:0 4px 4px 0;">🐄 축산 규모 감축·생산성 우선 전환</div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label" style="margin-bottom:12px;">대기질 전략 조치</div>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--muted); line-height:1.7;">
+        <div style="padding:12px 16px; border-left:2px solid var(--accent3); background:var(--card); border-radius:0 4px 4px 0;">⚡ 게르 지구 6만 가구 전기난방 보급 (2019–2025)</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent3); background:var(--card); border-radius:0 4px 4px 0;">🏙️ 게르 지구 10만 가구 아파트 이전</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent3); background:var(--card); border-radius:0 4px 4px 0;">🚗 Euro 5 연료 2030년 100% 전환 목표</div>
+        <div style="padding:12px 16px; border-left:2px solid var(--accent3); background:var(--card); border-radius:0 4px 4px 0;">📉 송배전 손실률 14% → 7.8% 감축</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: 시장 기회 -->
+<div class="section">
+  <div class="section-label">04 — 공기청정기 시장 기회</div>
+  <h2 class="section-title">CU가 들어가야 할<br>이유 5가지</h2>
+
+  <div class="grid-2">
+    <div class="opp-card fade-in">
+      <div class="opp-num">01</div>
+      <div class="opp-title">극한의 오염 → 극한의 수요</div>
+      <div class="opp-desc">겨울철 PM2.5 농도가 WHO 기준 수십 배를 초과. 실내 공기질에 대한 니즈가 구매 의사결정으로 직결되는 시장. 기후가 추워 실내 체류시간이 길어 효과도 극대화.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">02</div>
+      <div class="opp-title">정부 정책과 방향 일치</div>
+      <div class="opp-desc">NDC 및 대기질 전략에서 가정·학교·공공시설 내 공기질 개선이 명시. 정부 조달·보조금 프로그램에 편승 가능. B2G 채널 진입 여지 존재.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">03</div>
+      <div class="opp-title">어린이·취약계층 집중 수요</div>
+      <div class="opp-desc">UNICEF 경고 이후 영유아·어린이 건강에 대한 부모 불안감이 높음. 학교·유치원·병원 납품 B2B 시장이 성장 중. 프리미엄 제품군 정당성 확보 용이.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">04</div>
+      <div class="opp-title">게르 지구 — 블루오션</div>
+      <div class="opp-desc">20만 게르 가구가 석탄 난방 사용. 정부 전기난방 전환 정책과 연계된 공기청정기 번들 모델 가능. 이동식·저전력 소형 제품 수요 존재.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">05</div>
+      <div class="opp-title">중산층 성장 + 인식 제고</div>
+      <div class="opp-desc">광업 기반 경제 성장으로 울란바토르 중산층이 확대 중. 건강 인식이 높아지며 프리미엄 공기청정기에 대한 WTP(지불의향) 상승세. 한국 브랜드 신뢰도 높음.</div>
+    </div>
+    <div class="opp-card fade-in">
+      <div class="opp-num">06</div>
+      <div class="opp-title">경쟁 공백</div>
+      <div class="opp-desc">중국 저가 브랜드 외 프리미엄 포지셔닝 경쟁자가 부재. 한국 브랜드(삼성, LG 등) 대비 CU의 차별화된 포지셔닝 여지. 얼리무버 어드밴티지 확보 가능.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCLUSION -->
+<div class="section" style="border-bottom: none;">
+  <div class="section-label">05 — 결론</div>
+  <h2 class="section-title">진입 전략 요약</h2>
+
+  <div class="conclusion">
+    <h3>몽골은 지금 진입해야 한다</h3>
+    <p>
+      <strong>몽골의 대기오염은 단순한 환경 문제가 아니라 공중보건 위기입니다.</strong> 사망률 132명/10만명(세계 평균 대비 43% 초과), 폐암·심폐 사망의 30~40%가 대기오염 기인이라는 수치는 시장의 고통 지수가 극대화되어 있음을 의미합니다.
+    </p>
+    <p>
+      정부는 이미 2030년 NDC 목표와 대기질 전략을 통해 게르 지구 전기화, 차량 배기 규제, 건물 단열 강화를 추진 중입니다. <strong>이 과도기는 공기청정기 수요의 골든타임</strong> — 오염은 단기에 해결되지 않지만 구매력과 인식은 빠르게 올라가고 있습니다.
+    </p>
+    <p>
+      <strong>권장 진입 순서:</strong> ① 울란바토르 B2B (학교·병원·오피스) → ② 중산층 소비자 D2C → ③ 정부 보조금 연계 게르 지구 보급형 라인업
+    </p>
+  </div>
+</div>
+
+<footer>
+  <p>DATA SOURCE: CCAC SNAP REPORT · Mongolia Air Pollution & Climate Change · January 2020</p>
+  <p>ANALYSIS: CU Market Entry Intelligence · 2024</p>
+</footer>
+
+</body>
+</html>
